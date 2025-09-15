@@ -63,5 +63,76 @@ if selected_genre != 'All':
     ]
 
 st.header("Filtered Data Summary")
-st.write(f"Total Movies in Filtered Data: **{filtered_df['movie_id'].nunique()}**")
-st.write(f"Total Ratings in Filtered Data: **{len(filtered_df)}**")
+st.write(f"Total Unique Movies: **{filtered_df['movie_id'].nunique()}**")
+st.write(f"Total Ratings: **{len(filtered_df)}**")
+st.dataframe(filtered_df.head(10))
+    
+st.markdown("---")
+    
+st.header('1. Genre Breakdown')
+st.markdown('The chart below shows the total number of ratings for each genre based on your filters.')
+    
+genre_counts = filtered_df.assign(genre=filtered_df['genres'].str.split('|')).explode('genre')['genre'].value_counts()
+genre_counts_df = genre_counts.reset_index()
+genre_counts_df.columns = ['Genre', 'Number of Ratings']
+    
+fig1 = px.bar(genre_counts_df, 
+                x='Genre', 
+                y='Number of Ratings', 
+                title='Ratings Breakdown by Genre',
+                labels={'Genre': 'Genre', 'Number of Ratings': 'Total Ratings'})
+st.plotly_chart(fig1)
+    
+st.markdown("---")
+    
+st.header('2. Highest Rated Genres')
+st.markdown('This section identifies the genres with the highest average ratings.')
+
+genre_ratings_exploded = filtered_df.assign(genre=filtered_df['genres'].str.split('|')).explode('genre')
+mean_ratings_by_genre = genre_ratings_exploded.groupby('genre')['rating'].mean().sort_values(ascending=False).reset_index()
+mean_ratings_by_genre.columns = ['Genre', 'Mean Rating']
+
+fig2 = px.bar(mean_ratings_by_genre,
+                x='Genre',
+                y='Mean Rating',
+                color='Mean Rating',
+                title='Mean Rating by Genre',
+                labels={'Genre': 'Genre', 'Mean Rating': 'Average Rating'},
+                color_continuous_scale=px.colors.sequential.Viridis)
+st.plotly_chart(fig2)
+    
+st.markdown("---")
+
+st.header('3. Mean Rating Change Over Time')
+st.markdown('This line chart shows how the average movie rating has changed over the movie release years.')
+    
+
+ratings_with_year = filtered_df.dropna(subset=['year'])
+mean_ratings_by_year = ratings_with_year.groupby('year')['rating'].mean().reset_index()
+    
+fig3 = px.line(mean_ratings_by_year, 
+                x='year', 
+                y='rating', 
+                title='Mean Rating by Movie Release Year',
+                labels={'year': 'Movie Release Year', 'rating': 'Average Rating'})
+st.plotly_chart(fig3)
+
+st.markdown("---")
+    
+    
+st.header('4. Best-Rated Movies')
+st.markdown('This section identifies the top-rated movies based on a minimum number of ratings.')
+    
+movie_ratings = filtered_df.groupby('title').agg(
+    mean_rating=('rating', 'mean'),
+    rating_count=('rating', 'count')
+).reset_index()
+    
+
+top_5_ratings = movie_ratings[movie_ratings['rating_count'] >= 5].sort_values(by='mean_rating', ascending=False).head(5)
+    
+st.subheader('Top 5 Movies with at least 5 Ratings')
+if top_5_ratings.empty:
+    st.info("No movies meet this criteria with the current filters.")
+else:
+    st.dataframe(top_5_ratings)
