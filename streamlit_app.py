@@ -51,18 +51,15 @@ filtered_df = df[
 ]
 
 
-if selected_movie:
-    filtered_df = filtered_df[filtered_df['title'].isin(selected_movie)]
-
+if selected_movie != 'All':
+    filtered_df = filtered_df[filtered_df['title'] == selected_movie]
 
 if selected_occupation != 'All':
     filtered_df = filtered_df[filtered_df['occupation'] == selected_occupation]
 
-if selected_genre:
+if selected_genre != 'All':
     filtered_df = filtered_df[
-        filtered_df['genres'].apply(
-            lambda x: any(genre in x.split('|') for genre in selected_genre)
-        )
+        filtered_df['genres'].str.contains(selected_genre)
     ]
 
 st.header("Filtered Data Summary")
