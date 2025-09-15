@@ -65,12 +65,11 @@ if selected_genre != 'All':
 st.header("Filtered Data Summary")
 st.write(f"Total Unique Movies: **{filtered_df['movie_id'].nunique()}**")
 st.write(f"Total Ratings: **{len(filtered_df)}**")
-st.dataframe(filtered_df.head(10))
     
 st.markdown("---")
     
-st.header('1. Genre Breakdown')
-st.markdown('The chart below shows the total number of ratings for each genre based on your filters.')
+st.header('Genre Breakdown')
+st.markdown('The Total Reviews Of Each Genre')
     
 genre_counts = filtered_df.assign(genre=filtered_df['genres'].str.split('|')).explode('genre')['genre'].value_counts()
 genre_counts_df = genre_counts.reset_index()
@@ -85,8 +84,7 @@ st.plotly_chart(fig1)
     
 st.markdown("---")
     
-st.header('2. Highest Rated Genres')
-st.markdown('This section identifies the genres with the highest average ratings.')
+st.header('Highest Rated Genres')
 
 genre_ratings_exploded = filtered_df.assign(genre=filtered_df['genres'].str.split('|')).explode('genre')
 mean_ratings_by_genre = genre_ratings_exploded.groupby('genre')['rating'].mean().sort_values(ascending=False).reset_index()
@@ -103,8 +101,8 @@ st.plotly_chart(fig2)
     
 st.markdown("---")
 
-st.header('3. Mean Rating Change Over Time')
-st.markdown('This line chart shows how the average movie rating has changed over the movie release years.')
+st.header('Mean Rating Change Over Time')
+st.markdown('The Average Ratings in Reviews Over Time')
     
 
 ratings_with_year = filtered_df.dropna(subset=['year'])
@@ -120,8 +118,8 @@ st.plotly_chart(fig3)
 st.markdown("---")
     
     
-st.header('4. Best-Rated Movies')
-st.markdown('This section identifies the top-rated movies based on a minimum number of ratings.')
+st.header('Best-Rated Movies')
+st.markdown('The Best Rated Movies (MIN 5 REVIEWS)')
     
 movie_ratings = filtered_df.groupby('title').agg(
     mean_rating=('rating', 'mean'),
@@ -129,9 +127,9 @@ movie_ratings = filtered_df.groupby('title').agg(
 ).reset_index()
     
 
-top_5_ratings = movie_ratings[movie_ratings['rating_count'] >= 5].sort_values(by='mean_rating', ascending=False).head(5)
+top_5_ratings = movie_ratings[movie_ratings['rating_count'] >= 50].sort_values(by='mean_rating', ascending=False).head(5)
     
-st.subheader('Top 5 Movies with at least 5 Ratings')
+st.subheader('Top 5 Movies with at least 50 Ratings')
 if top_5_ratings.empty:
     st.info("No movies meet this criteria with the current filters.")
 else:
