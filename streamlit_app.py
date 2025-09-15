@@ -67,6 +67,15 @@ st.write(f"Total Unique Movies: **{filtered_df['movie_id'].nunique()}**")
 st.write(f"Total Ratings: **{len(filtered_df)}**")
     
 st.markdown("---")
+
+st.header("Overall Movie Ratings")
+st.markdown("This is a display of all movies over time that we have ratings for")
+
+fig_scatter = px.scatter(df,x='year',y='rating',title='All Movies Ranked',labels={'year':'Movie Release Year','rating': 'Rating'}, height=400,hover_data=['title'])
+fig_scatter.update_yaxes(range=[0,5.5])
+st.plotly_chart(fig_scatter, use_container_width=True)
+
+st.markdown("---")
     
 st.header('Genre Breakdown')
 st.markdown('The Total Reviews Of Each Genre')
