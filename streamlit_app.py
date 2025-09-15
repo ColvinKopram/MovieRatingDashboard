@@ -23,11 +23,11 @@ with st.sidebar:
         value=(int(df['age'].min()), int(df['age'].max()))
     )
     
-    all_movies = sorted(df['title'].unique())
-    selected_movies = st.multiselect(
-        'Select Movies:',
+    all_movies = ['All'] + sorted(df['title'].unique())
+    selected_movie = st.selectbox(
+        'Select a Movie:',
         options=all_movies,
-        default=all_movies
+        index=0
     )
     
     all_occupations = ['All'] + sorted(df['occupation'].unique())
@@ -37,11 +37,11 @@ with st.sidebar:
         index=0
     )
     
-    all_genres = sorted(df['genres'].str.split('|').explode().unique())
-    selected_genres = st.multiselect(
-        'Select Genres:',
+    all_genres = ['All'] + sorted(df['genres'].str.split('|').explode().unique())
+    selected_genre = st.selectbox(
+        'Select a Genre:',
         options=all_genres,
-        default=all_genres
+        index=0
     )
 
 
@@ -51,17 +51,17 @@ filtered_df = df[
 ]
 
 
-if selected_movies:
-    filtered_df = filtered_df[filtered_df['title'].isin(selected_movies)]
+if selected_movie:
+    filtered_df = filtered_df[filtered_df['title'].isin(selected_movie)]
 
 
 if selected_occupation != 'All':
     filtered_df = filtered_df[filtered_df['occupation'] == selected_occupation]
 
-if selected_genres:
+if selected_genre:
     filtered_df = filtered_df[
         filtered_df['genres'].apply(
-            lambda x: any(genre in x.split('|') for genre in selected_genres)
+            lambda x: any(genre in x.split('|') for genre in selected_genre)
         )
     ]
 
